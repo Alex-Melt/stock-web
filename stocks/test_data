@@ -1,0 +1,224 @@
+# @Time : 2023/4/4 11:19
+# @Author : 赵浩栋
+# @File : sql_concat.py
+# @Software: PyCharm
+import MySQLdb
+
+
+class SQLConn:
+    def __init__(self, stockNum):
+        self.mydb = MySQLdb.connect(host='localhost', user='root', passwd='root', db='reco_system', charset='utf8',
+                                    port=3308)
+        self.stockNum = stockNum
+        self.__table_day_sql = f"""CREATE TABLE IF NOT EXISTS stockdayinfo_{stockNum} (
+        `dayInfoId` bigint(20) NOT NULL AUTO_INCREMENT,
+        `date` date DEFAULT NULL,
+        `stockId` bigint(20) DEFAULT NULL,
+        `stockCode` varchar(50) DEFAULT NULL,
+        `open` double(10,3) DEFAULT NULL,
+        `high` double(10,3) DEFAULT NULL,
+        `low` double(10,3) DEFAULT NULL,
+        `close` double(10,3) DEFAULT NULL,
+        `preClose` double(10,3) DEFAULT NULL,
+        `volume` double(15,0) DEFAULT NULL,
+        `amount` double(15,0) DEFAULT NULL,
+        `ma5` double(15,5) DEFAULT NULL,
+        `ma10` double(15,5) DEFAULT NULL,
+        `ma20` double(15,5) DEFAULT NULL,
+        `ma30` double(15,5) DEFAULT NULL,
+        `ma60` double(15,5) DEFAULT NULL,
+        `ma120` double(15,5) DEFAULT NULL,
+        `ma200` double(15,5) DEFAULT NULL,
+        `ma250` double(15,5) DEFAULT NULL,
+        `volume120` double(15,0) DEFAULT NULL,
+        `k` double(15,5) DEFAULT NULL,
+        `d` double(15,5) DEFAULT NULL,
+        `j` double(15,5) DEFAULT NULL,
+        `dif` double(15,5) DEFAULT NULL,
+        `dea` double(15,5) DEFAULT NULL,
+        `macd` double(15,5) DEFAULT NULL,
+        `rsi6` double(15,5) DEFAULT NULL,
+        `rsi12` double(15,5) DEFAULT NULL,
+        `rsi24` double(15,5) DEFAULT NULL,
+        `wr6` double(15,5) DEFAULT NULL,
+        `wr10` double(15,5) DEFAULT NULL,
+        PRIMARY KEY (`dayInfoId`),
+        UNIQUE INDEX (`date`)
+        ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;"""
+        self.__table_week_sql = f"""CREATE TABLE IF NOT EXISTS stockweekinfo_{stockNum} (
+        `weekInfoId` bigint(20) NOT NULL AUTO_INCREMENT,
+        `date` date DEFAULT NULL,
+        `stockId` bigint(20) DEFAULT NULL,
+        `stockCode` varchar(50) DEFAULT NULL,
+        `open` double(10,3) DEFAULT NULL,
+        `high` double(10,3) DEFAULT NULL,
+        `low` double(10,3) DEFAULT NULL,
+        `close` double(10,3) DEFAULT NULL,
+        `volume` double(15,0) DEFAULT NULL,
+        `amount` double(15,0) DEFAULT NULL,
+        `ma5` double(15,5) DEFAULT NULL,
+        `ma10` double(15,5) DEFAULT NULL,
+        `ma20` double(15,5) DEFAULT NULL,
+        `ma30` double(15,5) DEFAULT NULL,
+        `ma60` double(15,5) DEFAULT NULL,
+        `ma120` double(15,5) DEFAULT NULL,
+        `ma200` double(15,5) DEFAULT NULL,
+        `ma250` double(15,5) DEFAULT NULL,
+        `k` double(15,5) DEFAULT NULL,
+        `d` double(15,5) DEFAULT NULL,
+        `j` double(15,5) DEFAULT NULL,
+        `dif` double(15,5) DEFAULT NULL,
+        `dea` double(15,5) DEFAULT NULL,
+        `macd` double(15,5) DEFAULT NULL,
+        `rsi6` double(15,5) DEFAULT NULL,
+        `rsi12` double(15,5) DEFAULT NULL,
+        `rsi24` double(15,5) DEFAULT NULL,
+        `wr6` double(15,5) DEFAULT NULL,
+        `wr10` double(15,5) DEFAULT NULL,
+        PRIMARY KEY (`weekInfoId`),
+        UNIQUE INDEX (`date`)
+        ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;"""
+        self.__table_month_sql = f"""CREATE TABLE IF NOT EXISTS stockmonthinfo_{stockNum} (
+        `monthInfoId` bigint(20) NOT NULL AUTO_INCREMENT,
+        `date` date DEFAULT NULL,
+        `stockId` bigint(20) DEFAULT NULL,
+        `stockCode` varchar(50) DEFAULT NULL,
+        `open` double(10,3) DEFAULT NULL,
+        `high` double(10,3) DEFAULT NULL,
+        `low` double(10,3) DEFAULT NULL,
+        `close` double(10,3) DEFAULT NULL,
+        `volume` double(15,0) DEFAULT NULL,
+        `amount` double(15,0) DEFAULT NULL,
+        `ma5` double(15,5) DEFAULT NULL,
+        `ma10` double(15,5) DEFAULT NULL,
+        `ma20` double(15,5) DEFAULT NULL,
+        `ma30` double(15,5) DEFAULT NULL,
+        `ma60` double(15,5) DEFAULT NULL,
+        `ma120` double(15,5) DEFAULT NULL,
+        `ma200` double(15,5) DEFAULT NULL,
+        `ma250` double(15,5) DEFAULT NULL,
+        `k` double(15,5) DEFAULT NULL,
+        `d` double(15,5) DEFAULT NULL,
+        `j` double(15,5) DEFAULT NULL,
+        `dif` double(15,5) DEFAULT NULL,
+        `dea` double(15,5) DEFAULT NULL,
+        `macd` double(15,5) DEFAULT NULL,
+        `rsi6` double(15,5) DEFAULT NULL,
+        `rsi12` double(15,5) DEFAULT NULL,
+        `rsi24` double(15,5) DEFAULT NULL,
+        `wr6` double(15,5) DEFAULT NULL,
+        `wr10` double(15,5) DEFAULT NULL,
+        PRIMARY KEY (`monthInfoId`),
+        UNIQUE INDEX (`date`)
+        ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;"""
+        self.__table_time_sql = f"""CREATE TABLE IF NOT EXISTS stocktimeinfo_{stockNum} (
+        `timeInfoId` bigint(20) NOT NULL AUTO_INCREMENT,
+        `date` date DEFAULT NULL,
+        `stockId` bigint(20) DEFAULT NULL,
+        `stockCode` varchar(50) DEFAULT NULL,
+        `price` double(10,3) DEFAULT NULL,
+        `time` time DEFAULT NULL,
+        `avgPrice` double(10,3) DEFAULT NULL,
+        `volume` double(15,0) DEFAULT NULL,
+        `amount` double(15,0) DEFAULT NULL,
+        `upDownRange` double(5,4) DEFAULT NULL,
+        PRIMARY KEY (`timeInfoId`),
+        UNIQUE INDEX (`date`, `time`)
+        ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;"""
+
+    def create_table(self):
+        my_cursor = self.mydb.cursor(MySQLdb.cursors.DictCursor)
+        my_cursor.execute('use reco_system')
+        my_cursor.execute(self.__table_day_sql)
+        my_cursor.execute(self.__table_week_sql)
+        my_cursor.execute(self.__table_month_sql)
+        my_cursor.execute(self.__table_time_sql)
+        self.mydb.commit()
+
+    def select_table(self, table_name):
+        my_cursor = self.mydb.cursor(MySQLdb.cursors.DictCursor)
+        my_cursor.execute('use reco_system')
+        my_cursor.execute(f"SELECT * FROM `{table_name}` order by date asc")
+        fetchall = my_cursor.fetchall()
+        return fetchall
+
+    def insert_time_data(self, data):
+        res = []
+        for i in data:
+            res.append(
+                f"({i['date']},{i['time']},{i['stockCode']},{i['amount']},{i['volume']},{i['price']},{i['avgPrice']},{i['upDownRange']})")
+        res = ','.join(res)
+        insert_time_sql = f"""INSERT ignore stocktimeinfo_{self.stockNum} (date,time, stockCode, amount, volume,
+                price, avgPrice, upDownRange) VALUES {res}"""
+        my_cursor = self.mydb.cursor(MySQLdb.cursors.DictCursor)
+        my_cursor.execute('use reco_system')
+        my_cursor.execute(insert_time_sql)
+        self.mydb.commit()
+
+    def insert_day_data(self, data):
+        res = []
+        for i in data:
+            # res.append(
+            # f"({i['date']},{i['open']},{i['high']},{i['low']},{i['close']},{i['volume']},\
+            #     {i['amount']},{i['ma5']},{i['ma10']},{i['ma20']},{i['ma30']},{i['ma60']},\
+            #     {i['ma120']},{i['ma200']},{i['ma250']},{i['volume120']},{i['k']},{i['d']},{i['j']},\
+            #     {i['dif']},{i['dea']},{i['macd']},{i['wr6']},{i['wr10']},{i['rsi6']},{i['rsi12']},\
+            #     {i['rsi24']},{i['preClose']})")
+            res.append(f"({i['date']},{i['open']},{i['high']},{i['low']},{i['close']},{i['volume']},\
+                            {i['amount']},{i['preClose']})")
+        res = ','.join(res)
+        # insert_day_sql = f"""INSERT ignore stockdayinfo_{self.stockNum} (date, open, high, low, close, volume, amount,
+        # ma5, ma10, ma20, ma30, ma60, ma120, ma200, ma250, volume120, k, d, j, dif, dea, macd, wr6, wr10
+        # ,rsi6, rsi12, rsi24, preClose) VALUES {res}"""
+        insert_day_sql = f"""INSERT ignore stockdayinfo_{self.stockNum} (date, open, high, low, close, volume, amount,
+                    preClose) VALUES {res}"""
+
+        my_cursor = self.mydb.cursor(MySQLdb.cursors.DictCursor)
+        my_cursor.execute('use reco_system')
+        my_cursor.execute(insert_day_sql)
+        self.mydb.commit()
+
+
+def insert_week_data(self, data):
+    res = []
+    for i in data:
+        # res.append(
+        # f"({i['date']},{i['open']},{i['high']},{i['low']},{i['close']},{i['volume']},\
+        #                 {i['amount']},{i['ma5']},{i['ma10']},{i['ma20']},{i['ma30']},{i['ma60']},\
+        #                 {i['ma120']},{i['ma200']},{i['ma250']},{i['volume120']},{i['k']},{i['d']},{i['j']},\
+        #                 {i['dif']},{i['dea']},{i['macd']},{i['wr6']},{i['wr10']},{i['rsi6']},{i['rsi12']},\
+        #                 {i['rsi24']})")
+        res.append(f"({i['date']},{i['open']},{i['high']},{i['low']},{i['close']},{i['volume']},\
+                                            {i['amount']})")
+    res = ','.join(res)
+    # insert_week_sql = f"""INSERT ignore stockweekinfo_{self.stockNum} (date, open, high, low, close, volume, amount,
+    #     ma5, ma10, ma20, ma30, ma60, ma120, ma200, ma250, k, d, j, dif, dea, macd, wr6, wr10
+    #     ,rsi6, rsi12, rsi24) VALUES {res}"""
+    insert_week_sql = f"""INSERT ignore stockweekinfo_{self.stockNum} (date, open, high, low, close, volume, amount) VALUES {res}"""
+
+    my_cursor = self.mydb.cursor(MySQLdb.cursors.DictCursor)
+    my_cursor.execute('use reco_system')
+    my_cursor.execute(insert_week_sql)
+    self.mydb.commit()
+
+
+def insert_month_data(self, data):
+    res = []
+    for i in data:
+        res.append(
+            # f"({i['date']},{i['open']},{i['high']},{i['low']},{i['close']},{i['volume']},\
+            #                 {i['amount']},{i['ma5']},{i['ma10']},{i['ma20']},{i['ma30']},{i['ma60']},\
+            #                 {i['ma120']},{i['ma200']},{i['ma250']},{i['volume120']},{i['k']},{i['d']},{i['j']},\
+            #                 {i['dif']},{i['dea']},{i['macd']},{i['wr6']},{i['wr10']},{i['rsi6']},{i['rsi12']},{i['rsi24']})")
+            f"({i['date']},{i['open']},{i['high']},{i['low']},{i['close']},{i['volume']},\
+                                        {i['amount']})")
+    res = ','.join(res)
+    # insert_month_sql = f"""INSERT ignore stockmonthinfo_{self.stockNum} (date, open, high, low, close, volume, amount,
+    #     ma5, ma10, ma20, ma30, ma60, ma120, ma200, ma250, k, d, j, dif, dea, macd, wr6, wr10
+    #     ,rsi6, rsi12, rsi24) VALUES {res}"""
+    insert_month_sql = f"""INSERT ignore stockmonthinfo_{self.stockNum} (date, open, high, low, close, volume, amount) VALUES {res}"""
+
+    my_cursor = self.mydb.cursor(MySQLdb.cursors.DictCursor)
+    my_cursor.execute('use reco_system')
+    my_cursor.execute(insert_month_sql)
+    self.mydb.commit()
